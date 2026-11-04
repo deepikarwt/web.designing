@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio Hero</title>
+  <style>
+    .hero {
+      min-height: 75vh;
+      display: grid;
+      align-items: center;
+      padding: 3rem 10%;
+      color: white;
+      background:
+        linear-gradient(90deg, #14241ddd, #14241d33),
+        url("https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=1400&q=80")
+        center / cover;
+    }
+
+    .hero h1 {
+      margin: 0.3em 0;
+      font: 700 clamp(3rem, 8vw, 6rem) / 1 Georgia, serif;
+    }
+
+    .hero a {
+      display: inline-block;
+      padding: 0.9rem 1.3rem;
+      background: #e66b4f;
+      color: white;
+      text-decoration: none;
+    }
+
+    @media (max-width: 600px) {
+      .hero {
+        min-height: 60vh;
+        padding: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="hero">
+    <div>
+      <p>DESIGN · CODE · CREATE</p>
+      <h1>Ideas made<br>for people.</h1>
+      <a href="#work">Explore my work</a>
+    </div>
+  </section>
+</body>
+</html>

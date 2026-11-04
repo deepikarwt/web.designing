@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive Layout</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0 auto;
+      max-width: 1100px;
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+      padding: 2rem;
+      background: #e8f0ed;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+    article {
+      padding: 3rem 1rem;
+      background: #dce8e2;
+      text-align: center;
+    }
+
+    /* Tablet */
+    @media (min-width: 601px) and (max-width: 900px) {
+      main {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* Mobile */
+    @media (max-width: 600px) {
+      header {
+        padding: 1rem;
+      }
+
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>My Portfolio</h1>
+  </header>
+
+  <main>
+    <article>Project One</article>
+    <article>Project Two</article>
+    <article>Project Three</article>
+  </main>
+</body>
+</html>

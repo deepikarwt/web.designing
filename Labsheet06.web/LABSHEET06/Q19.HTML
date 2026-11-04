@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Search</title>
+  <style>
+    #projects {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .project {
+      padding: 2rem;
+      background: #e8f0ed;
+    }
+  </style>
+</head>
+<body>
+  <h1>My Projects</h1>
+
+  <label for="search">Search projects:</label>
+  <input id="search" type="search" placeholder="Try design">
+
+  <section id="projects">
+    <article class="project" data-tags="web design">Website Design</article>
+    <article class="project" data-tags="branding logo">Brand Identity</article>
+    <article class="project" data-tags="web app">Web Application</article>
+  </section>
+
+  <p id="emptyMessage" hidden>No projects found.</p>
+
+  <script>
+    const search = document.querySelector("#search");
+    const projects = [...document.querySelectorAll(".project")];
+    const emptyMessage = document.querySelector("#emptyMessage");
+
+    search.addEventListener("input", () => {
+      const term = search.value.trim().toLowerCase();
+      let visibleCount = 0;
+
+      projects.forEach((project) => {
+        const searchableText =
+          (project.textContent + " " + project.dataset.tags).toLowerCase();
+        const matches = searchableText.includes(term);
+
+        project.hidden = !matches;
+        if (matches) visibleCount++;
+      });
+
+      emptyMessage.hidden = visibleCount > 0;
+    });
+  </script>
+</body>
+</html>

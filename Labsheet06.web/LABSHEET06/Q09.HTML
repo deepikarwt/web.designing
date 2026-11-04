@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smooth Scrolling</title>
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    section {
+      min-height: 100vh;
+      padding: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="#about">About</a> |
+    <a href="#work">Work</a>
+  </nav>
+
+  <section id="about">
+    <h1>About</h1>
+    <p>This is the About section.</p>
+  </section>
+
+  <section id="work">
+    <h1>Work</h1>
+    <p>This is the Work section.</p>
+  </section>
+
+  <script>
+    document.querySelectorAll('nav a[href^="#"]').forEach((link) => {
+      link.addEventListener("click", (event) => {
+        const target = document.querySelector(link.getAttribute("href"));
+
+        if (target) {
+          event.preventDefault();
+          target.scrollIntoView({ behavior: "smooth" });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

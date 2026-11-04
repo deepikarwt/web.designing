@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Print-Friendly Portfolio</title>
+  <style>
+    body {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      font: 16px Arial, sans-serif;
+    }
+
+    article {
+      border: 1px solid #aaaaaa;
+      padding: 1rem;
+    }
+
+    @media print {
+      body {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        color: #000000;
+        font: 11pt Georgia, serif;
+      }
+
+      .screen-only {
+        display: none;
+      }
+
+      article {
+        border: 1px solid #777777;
+        break-inside: avoid;
+      }
+
+      h1,
+      h2 {
+        break-after: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="screen-only">
+    <nav>Home | About | Work</nav>
+  </header>
+
+  <main>
+    <h1>My Portfolio</h1>
+    <p>This page is formatted for screen reading and printing.</p>
+
+    <article>
+      <h2>Project One</h2>
+      <p>A description of my project.</p>
+    </article>
+  </main>
+
+  <footer class="screen-only">
+    Social links | Contact
+  </footer>
+</body>
+</html>

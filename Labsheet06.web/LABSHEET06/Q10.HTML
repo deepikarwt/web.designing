@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAQ Accordion</title>
+  <style>
+    .faq {
+      max-width: 600px;
+      font-family: Arial, sans-serif;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid #bbbbbb;
+    }
+
+    .faq-item button {
+      width: 100%;
+      padding: 1rem 0;
+      border: none;
+      background: white;
+      text-align: left;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .faq-item button span {
+      float: right;
+    }
+  </style>
+</head>
+<body>
+  <section class="faq">
+    <h1>Frequently Asked Questions</h1>
+
+    <article class="faq-item">
+      <button aria-expanded="false">
+        How do I get started? <span>+</span>
+      </button>
+      <p hidden>Send us a message using the contact form.</p>
+    </article>
+
+    <article class="faq-item">
+      <button aria-expanded="false">
+        How long does a project take? <span>+</span>
+      </button>
+      <p hidden>Most projects take a few weeks.</p>
+    </article>
+  </section>
+
+  <script>
+    document.querySelectorAll(".faq-item button").forEach((button) => {
+      button.addEventListener("click", () => {
+        const answer = button.nextElementSibling;
+        const isOpen = button.getAttribute("aria-expanded") === "true";
+
+        button.setAttribute("aria-expanded", String(!isOpen));
+        answer.hidden = isOpen;
+        button.querySelector("span").textContent = isOpen ? "+" : "−";
+      });
+    });
+  </script>
+</body>
+</html>

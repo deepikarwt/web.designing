@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modal Popup</title>
+  <style>
+    #backdrop {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: #0008;
+    }
+
+    #backdrop[hidden] {
+      display: none;
+    }
+
+    .modal {
+      max-width: 400px;
+      padding: 2rem;
+      background: white;
+    }
+
+    #closeButton {
+      float: right;
+    }
+  </style>
+</head>
+<body>
+  <button id="openButton">Open details</button>
+
+  <div id="backdrop" hidden>
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button id="closeButton" aria-label="Close">X</button>
+      <h2 id="modalTitle">Hello there</h2>
+      <p>This is a modal window.</p>
+    </section>
+  </div>
+
+  <script>
+    const backdrop = document.querySelector("#backdrop");
+
+    document.querySelector("#openButton").addEventListener("click", () => {
+      backdrop.hidden = false;
+    });
+
+    document.querySelector("#closeButton").addEventListener("click", () => {
+      backdrop.hidden = true;
+    });
+
+    backdrop.addEventListener("click", (event) => {
+      if (event.target === backdrop) {
+        backdrop.hidden = true;
+      }
+    });
+  </script>
+</body>
+</html>

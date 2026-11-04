@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Form Validation</title>
+</head>
+<body>
+  <h1>Contact Form</h1>
+
+  <form id="contactForm">
+    <label>
+      Name:
+      <input type="text" name="name" required>
+    </label>
+    <br><br>
+
+    <label>
+      Email:
+      <input type="email" name="email" required>
+    </label>
+    <br><br>
+
+    <label>
+      Message:
+      <textarea name="message" required></textarea>
+    </label>
+    <br><br>
+
+    <button type="submit">Send</button>
+  </form>
+
+  <p id="status" role="status"></p>
+
+  <script>
+    const form = document.querySelector("#contactForm");
+    const status = document.querySelector("#status");
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const name = form.elements.name.value.trim();
+      const email = form.elements.email.value.trim();
+      const message = form.elements.message.value.trim();
+
+      if (!name || !email || !message) {
+        status.textContent = "Please complete every field.";
+        return;
+      }
+
+      if (!form.elements.email.validity.valid) {
+        status.textContent = "Please enter a valid email address.";
+        return;
+      }
+
+      status.textContent = "Form is valid. Connect it to a server to receive messages.";
+    });
+  </script>
+</body>
+</html>

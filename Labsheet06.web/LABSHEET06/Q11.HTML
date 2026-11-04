@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Testimonials Slider</title>
+  <style>
+    blockquote {
+      min-height: 100px;
+      font: 1.5rem Georgia, serif;
+      transition: opacity 0.25s;
+    }
+  </style>
+</head>
+<body>
+  <h1>Testimonials</h1>
+  <blockquote id="quote"></blockquote>
+  <button id="previous">Previous</button>
+  <button id="next">Next</button>
+
+  <script>
+    const testimonials = [
+      {
+        text: "Excellent work and great communication.",
+        name: "Sam"
+      },
+      {
+        text: "The website looks fantastic.",
+        name: "Jordan"
+      },
+      {
+        text: "A thoughtful and reliable partner.",
+        name: "Lee"
+      }
+    ];
+
+    let currentIndex = 0;
+    const quote = document.querySelector("#quote");
+
+    function showTestimonial() {
+      quote.style.opacity = "0";
+
+      setTimeout(() => {
+        const item = testimonials[currentIndex];
+        quote.textContent = `“${item.text}” — ${item.name}`;
+        quote.style.opacity = "1";
+      }, 250);
+    }
+
+    document.querySelector("#previous").addEventListener("click", () => {
+      currentIndex =
+        (currentIndex - 1 + testimonials.length) % testimonials.length;
+      showTestimonial();
+    });
+
+    document.querySelector("#next").addEventListener("click", () => {
+      currentIndex = (currentIndex + 1) % testimonials.length;
+      showTestimonial();
+    });
+
+    showTestimonial();
+  </script>
+</body>
+</html>

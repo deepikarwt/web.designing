@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Back to Top Button</title>
+  <style>
+    #backToTop {
+      display: none;
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      padding: 12px 16px;
+      border: none;
+      background: #246e5c;
+      color: white;
+      cursor: pointer;
+    }
+
+    #backToTop.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="top">Scroll down</h1>
+  <p style="height: 180vh;">Page content goes here.</p>
+
+  <button id="backToTop" aria-label="Back to top">↑ Top</button>
+
+  <script>
+    const button = document.querySelector("#backToTop");
+
+    window.addEventListener("scroll", () => {
+      button.classList.toggle("visible", window.scrollY > 250);
+    });
+
+    button.addEventListener("click", () => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+    });
+  </script>
+</body>
+</html>

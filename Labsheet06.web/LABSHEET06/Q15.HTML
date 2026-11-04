@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animated Statistics</title>
+  <style>
+    #stats {
+      display: flex;
+      gap: 3rem;
+      margin-top: 100vh;
+      font-family: Arial, sans-serif;
+    }
+
+    .counter {
+      color: #267967;
+      font-size: 3rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Scroll down to see the counters</h1>
+
+  <section id="stats">
+    <p><strong class="counter" data-target="42">0</strong> Projects</p>
+    <p><strong class="counter" data-target="8">0</strong> Years</p>
+  </section>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+
+        const counter = entry.target;
+        const target = Number(counter.dataset.target);
+        const startTime = performance.now();
+        const duration = 1000;
+
+        function updateCounter(currentTime) {
+          const progress = Math.min(
+            (currentTime - startTime) / duration,
+            1
+          );
+
+          counter.textContent = Math.floor(target * progress);
+
+          if (progress < 1) {
+            requestAnimationFrame(updateCounter);
+          }
+        }
+
+        requestAnimationFrame(updateCounter);
+        observer.unobserve(counter);
+      });
+    });
+
+    document.querySelectorAll(".counter").forEach((counter) => {
+      observer.observe(counter);
+    });
+  </script>
+</body>
+</html>

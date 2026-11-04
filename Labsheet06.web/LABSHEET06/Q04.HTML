@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hamburger Menu</title>
+  <style>
+    nav {
+      display: flex;
+      gap: 1rem;
+    }
+
+    #menuButton {
+      display: none;
+    }
+
+    @media (max-width: 600px) {
+      #menuButton {
+        display: block;
+      }
+
+      nav {
+        display: none;
+        flex-direction: column;
+        margin-top: 1rem;
+      }
+
+      nav.open {
+        display: flex;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button id="menuButton" aria-expanded="false">☰ Menu</button>
+
+  <nav id="menu">
+    <a href="#home">Home</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </nav>
+
+  <script>
+    const button = document.querySelector("#menuButton");
+    const menu = document.querySelector("#menu");
+
+    button.addEventListener("click", () => {
+      const isOpen = menu.classList.toggle("open");
+      button.setAttribute("aria-expanded", isOpen);
+    });
+  </script>
+</body>
+</html>
