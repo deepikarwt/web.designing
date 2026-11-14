@@ -1,0 +1,29 @@
+<?php
+session_start();
+require 'db.php';
+
+$bookId = filter_input(INPUT_POST, 'book_id', FILTER_VALIDATE_INT);
+$quantity = max(1, filter_input(INPUT_POST, 'quantity', FILTER_VALIDATE_INT) ?: 1);
+
+if (!$bookId) {
+    http_response_code(400);
+    exit('Invalid book.');
+}
+
+$stmt = $db->prepare('SELECT stock FROM books WHERE id = ?');
+$stmt->bind_param('i', $bookId);
+$stmt->execute();
+$book = $stmt->get_result()->fetch_assoc();
+
+if (!$book) {
+    http_response_code(404);
+    exit('Book not found.');
+}
+
+$_SESSION['cart'] ??= [];
+$current = (int)($_SESSION['cart'][$bookId] ?? 0);
+if ($current + $quantity > (int)$book['stock']) {
+    exit('Requested quantity exceeds available stock.');
+}
+$_SESSION['cart'][$bookId] = $current + $quantity;
+echo 'Added to cart.';

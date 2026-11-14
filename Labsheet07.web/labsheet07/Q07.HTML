@@ -1,0 +1,78 @@
+<?php
+session_start();
+require 'db.php';
+
+if (empty($_SESSION['user_id']) || empty($_SESSION['cart'])) {
+    header('Location: cart.php');
+    exit;
+}
+
+$error = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = trim($_POST['shipping_name'] ?? '');
+    $address = trim($_POST['shipping_address'] ?? '');
+
+    if ($name === '' || $address === '') {
+        $error = 'Enter your shipping name and address.';
+    } else {
+        $db->begin_transaction();
+
+        try {
+            $total = 0;
+            foreach ($_SESSION['cart'] as $bookId => $qty) {
+                $stmt = $db->prepare('SELECT price, stock FROM books WHERE id = ? FOR UPDATE');
+                $stmt->bind_param('i', $bookId);
+                $stmt->execute();
+                $book = $stmt->get_result()->fetch_assoc();
+
+                if (!$book || $qty < 1 || $qty > (int)$book['stock']) {
+                    throw new Exception('A cart item is unavailable in the requested quantity.');
+                }
+                $total += (float)$book['price'] * $qty;
+            }
+
+            $userId = (int)$_SESSION['user_id'];
+            $stmt = $db->prepare(
+                'INSERT INTO orders (user_id, total, shipping_name, shipping_address, status)
+                 VALUES (?, ?, ?, ?, "Pending")'
+            );
+            $stmt->bind_param('idss', $userId, $total, $name, $address);
+            $stmt->execute();
+            $orderId = $db->insert_id;
+
+            foreach ($_SESSION['cart'] as $bookId => $qty) {
+                $stmt = $db->prepare('SELECT price FROM books WHERE id = ?');
+                $stmt->bind_param('i', $bookId);
+                $stmt->execute();
+                $price = (float)$stmt->get_result()->fetch_assoc()['price'];
+
+                $stmt = $db->prepare(
+                    'INSERT INTO order_items (order_id, book_id, quantity, unit_price)
+                     VALUES (?, ?, ?, ?)'
+                );
+                $stmt->bind_param('iiid', $orderId, $bookId, $qty, $price);
+                $stmt->execute();
+
+                $stmt = $db->prepare('UPDATE books SET stock = stock - ? WHERE id = ?');
+                $stmt->bind_param('ii', $qty, $bookId);
+                $stmt->execute();
+            }
+
+            $db->commit();
+            $_SESSION['cart'] = [];
+            header("Location: invoice.php?order_id=$orderId");
+            exit;
+        } catch (Throwable $e) {
+            $db->rollback();
+            $error = $e->getMessage();
+        }
+    }
+}
+?>
+<form method="post">
+  <h1>Checkout</h1>
+  <?php if ($error): ?><p><?= htmlspecialchars($error) ?></p><?php endif; ?>
+  <label>Name <input name="shipping_name" required></label>
+  <label>Shipping address <textarea name="shipping_address" required></textarea></label>
+  <button type="submit">Place order</button>
+</form>

@@ -1,0 +1,40 @@
+<?php
+session_start();
+require 'db.php';
+
+$bookId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+if (!$bookId) exit('Invalid book.');
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (empty($_SESSION['user_id'])) exit('Log in to leave a review.');
+
+    $rating = filter_var($_POST['rating'] ?? '', FILTER_VALIDATE_INT);
+    $comment = trim($_POST['comment'] ?? '');
+    if ($rating < 1 || $rating > 5 || $comment === '') exit('Enter a rating and comment.');
+
+    $userId = (int)$_SESSION['user_id'];
+    $stmt = $db->prepare('INSERT INTO reviews (book_id, user_id, rating, comment) VALUES (?, ?, ?, ?)');
+    $stmt->bind_param('iiis', $bookId, $userId, $rating, $comment);
+    $stmt->execute();
+}
+
+$stmt = $db->prepare(
+    'SELECT r.rating, r.comment, u.name FROM reviews r JOIN users u ON u.id = r.user_id
+     WHERE r.book_id = ? ORDER BY r.id DESC'
+);
+$stmt->bind_param('i', $bookId);
+$stmt->execute();
+$reviews = $stmt->get_result();
+?>
+<?php while ($review = $reviews->fetch_assoc()): ?>
+  <p><?= str_repeat('★', (int)$review['rating']) ?> <?= htmlspecialchars($review['comment']) ?>
+     — <?= htmlspecialchars($review['name']) ?></p>
+<?php endwhile; ?>
+<form method="post">
+  <select name="rating" required>
+    <option value="">Rating</option>
+    <?php for ($i=1; $i<=5; $i++): ?><option value="<?= $i ?>"><?= $i ?></option><?php endfor; ?>
+  </select>
+  <textarea name="comment" required></textarea>
+  <button>Submit review</button>
+</form>

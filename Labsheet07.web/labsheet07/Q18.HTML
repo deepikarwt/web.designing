@@ -1,0 +1,21 @@
+<form id="register" novalidate>
+  <input id="email" type="email" required placeholder="Email">
+  <input id="password" type="password" minlength="8" required placeholder="Password">
+  <button>Register</button>
+</form>
+
+<form id="checkout" novalidate>
+  <input id="shipping" required placeholder="Shipping address">
+  <button>Place order</button>
+</form>
+
+<script>
+document.querySelectorAll('form').forEach(form => {
+  form.addEventListener('submit', event => {
+    if (!form.checkValidity()) {
+      event.preventDefault();
+      form.reportValidity();
+    }
+  });
+});
+</script>

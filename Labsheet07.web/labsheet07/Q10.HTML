@@ -1,0 +1,36 @@
+<?php
+require 'db.php';
+
+$term = trim($_GET['q'] ?? '');
+$category = trim($_GET['category'] ?? '');
+
+$sql = 'SELECT id, title, author, price FROM books WHERE (title LIKE ? OR author LIKE ?)';
+$params = ["%$term%", "%$term%"];
+$types = 'ss';
+
+if ($category !== '') {
+    $sql .= ' AND category = ?';
+    $params[] = $category;
+    $types .= 's';
+}
+$sql .= ' ORDER BY title';
+
+$stmt = $db->prepare($sql);
+$stmt->bind_param($types, ...$params);
+$stmt->execute();
+$books = $stmt->get_result();
+?>
+<form method="get">
+  <input name="q" value="<?= htmlspecialchars($term) ?>" placeholder="Title or author">
+  <input name="category" value="<?= htmlspecialchars($category) ?>" placeholder="Category">
+  <button>Search</button>
+</form>
+<div class="book-grid">
+<?php while ($book = $books->fetch_assoc()): ?>
+  <article>
+    <h2><?= htmlspecialchars($book['title']) ?></h2>
+    <p><?= htmlspecialchars($book['author']) ?></p>
+    <p>$<?= number_format((float)$book['price'], 2) ?></p>
+  </article>
+<?php endwhile; ?>
+</div>

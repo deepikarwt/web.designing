@@ -1,0 +1,32 @@
+<?php
+session_start();
+require 'db.php';
+
+if (($_SESSION['role'] ?? '') !== 'admin') {
+    http_response_code(403);
+    exit('Forbidden');
+}
+
+$summary = $db->query(
+    "SELECT COUNT(*) AS order_count,
+            COALESCE(SUM(total), 0) AS revenue
+     FROM orders
+     WHERE status IN ('Shipped', 'Delivered')"
+)->fetch_assoc();
+
+$daily = $db->query(
+    "SELECT DATE(created_at) AS sale_date, SUM(total) AS revenue
+     FROM orders
+     WHERE status IN ('Shipped', 'Delivered')
+     GROUP BY DATE(created_at)
+     ORDER BY sale_date DESC
+     LIMIT 30"
+);
+?>
+<h1>Sales summary</h1>
+<p>Completed orders: <?= (int)$summary['order_count'] ?></p>
+<p>Total revenue: $<?= number_format((float)$summary['revenue'], 2) ?></p>
+<h2>Daily revenue</h2>
+<?php while ($row = $daily->fetch_assoc()): ?>
+  <p><?= htmlspecialchars($row['sale_date']) ?> — $<?= number_format((float)$row['revenue'], 2) ?></p>
+<?php endwhile; ?>

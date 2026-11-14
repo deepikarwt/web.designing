@@ -1,0 +1,32 @@
+<?php
+session_start();
+require 'db.php';
+
+if (empty($_SESSION['user_id'])) exit('Log in first.');
+$orderId = filter_input(INPUT_GET, 'order_id', FILTER_VALIDATE_INT);
+$userId = (int)$_SESSION['user_id'];
+
+$stmt = $db->prepare(
+    'SELECT id, total, status, created_at FROM orders WHERE id = ? AND user_id = ?'
+);
+$stmt->bind_param('ii', $orderId, $userId);
+$stmt->execute();
+$order = $stmt->get_result()->fetch_assoc();
+if (!$order) exit('Order not found.');
+
+$stmt = $db->prepare(
+    'SELECT b.title, oi.quantity, oi.unit_price
+     FROM order_items oi JOIN books b ON b.id = oi.book_id
+     WHERE oi.order_id = ?'
+);
+$stmt->bind_param('i', $orderId);
+$stmt->execute();
+$items = $stmt->get_result();
+?>
+<h1>Invoice for order #<?= (int)$order['id'] ?></h1>
+<?php while ($item = $items->fetch_assoc()): ?>
+  <p><?= htmlspecialchars($item['title']) ?> × <?= (int)$item['quantity'] ?>
+     — $<?= number_format((float)$item['unit_price'] * (int)$item['quantity'], 2) ?></p>
+<?php endwhile; ?>
+<strong>Total: $<?= number_format((float)$order['total'], 2) ?></strong>
+<p>Status: <?= htmlspecialchars($order['status']) ?></p>

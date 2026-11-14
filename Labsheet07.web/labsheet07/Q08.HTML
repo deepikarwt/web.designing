@@ -1,0 +1,61 @@
+<?php
+session_start();
+require 'db.php';
+
+if (empty($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
+    http_response_code(403);
+    exit('Forbidden');
+}
+
+$message = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = $_POST['action'] ?? '';
+
+    if ($action === 'add') {
+        $title = trim($_POST['title'] ?? '');
+        $author = trim($_POST['author'] ?? '');
+        $price = filter_var($_POST['price'] ?? '', FILTER_VALIDATE_FLOAT);
+        $stock = filter_var($_POST['stock'] ?? '', FILTER_VALIDATE_INT);
+
+        if ($title && $author && $price !== false && $price >= 0 && $stock !== false && $stock >= 0) {
+            $stmt = $db->prepare('INSERT INTO books (title, author, price, stock) VALUES (?, ?, ?, ?)');
+            $stmt->bind_param('ssdi', $title, $author, $price, $stock);
+            $stmt->execute();
+            $message = 'Book added.';
+        }
+    } elseif ($action === 'update') {
+        $id = filter_var($_POST['id'] ?? '', FILTER_VALIDATE_INT);
+        $price = filter_var($_POST['price'] ?? '', FILTER_VALIDATE_FLOAT);
+        $stock = filter_var($_POST['stock'] ?? '', FILTER_VALIDATE_INT);
+
+        if ($id && $price !== false && $price >= 0 && $stock !== false && $stock >= 0) {
+            $stmt = $db->prepare('UPDATE books SET price = ?, stock = ? WHERE id = ?');
+            $stmt->bind_param('dii', $price, $stock, $id);
+            $stmt->execute();
+            $message = 'Book updated.';
+        }
+    }
+}
+
+$books = $db->query('SELECT id, title, author, price, stock FROM books ORDER BY title');
+?>
+<h1>Admin dashboard</h1>
+<p><?= htmlspecialchars($message) ?></p>
+<form method="post">
+  <input type="hidden" name="action" value="add">
+  <input name="title" placeholder="Title" required>
+  <input name="author" placeholder="Author" required>
+  <input name="price" type="number" step="0.01" min="0" required>
+  <input name="stock" type="number" min="0" required>
+  <button>Add book</button>
+</form>
+<?php while ($book = $books->fetch_assoc()): ?>
+<form method="post">
+  <input type="hidden" name="action" value="update">
+  <input type="hidden" name="id" value="<?= (int)$book['id'] ?>">
+  <?= htmlspecialchars($book['title']) ?>
+  <input name="price" type="number" step="0.01" min="0" value="<?= htmlspecialchars($book['price']) ?>">
+  <input name="stock" type="number" min="0" value="<?= (int)$book['stock'] ?>">
+  <button>Save</button>
+</form>
+<?php endwhile; ?>

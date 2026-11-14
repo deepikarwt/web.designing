@@ -1,0 +1,23 @@
+<?php
+require 'db.php';
+
+$perPage = 12;
+$page = max(1, filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT) ?: 1);
+$offset = ($page - 1) * $perPage;
+
+$total = (int)$db->query('SELECT COUNT(*) AS n FROM books')->fetch_assoc()['n'];
+$totalPages = max(1, (int)ceil($total / $perPage));
+
+$stmt = $db->prepare('SELECT id, title, author, price FROM books ORDER BY id LIMIT ? OFFSET ?');
+$stmt->bind_param('ii', $perPage, $offset);
+$stmt->execute();
+$books = $stmt->get_result();
+?>
+<?php while ($book = $books->fetch_assoc()): ?>
+  <p><?= htmlspecialchars($book['title']) ?> — $<?= number_format((float)$book['price'], 2) ?></p>
+<?php endwhile; ?>
+<nav>
+<?php for ($i = 1; $i <= $totalPages; $i++): ?>
+  <a href="?page=<?= $i ?>"><?= $i ?></a>
+<?php endfor; ?>
+</nav>

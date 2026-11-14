@@ -1,0 +1,44 @@
+<?php
+session_start();
+require 'db.php';
+
+if (($_SESSION['role'] ?? '') !== 'admin') {
+    http_response_code(403);
+    exit('Forbidden');
+}
+
+$statuses = ['Pending', 'Shipped', 'Delivered'];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id = filter_var($_POST['order_id'] ?? '', FILTER_VALIDATE_INT);
+    $status = $_POST['status'] ?? '';
+
+    if ($id && in_array($status, $statuses, true)) {
+        $stmt = $db->prepare('UPDATE orders SET status = ? WHERE id = ?');
+        $stmt->bind_param('si', $status, $id);
+        $stmt->execute();
+    }
+}
+
+$orders = $db->query(
+    'SELECT o.id, o.user_id, o.total, o.status, o.created_at
+     FROM orders o ORDER BY o.created_at DESC'
+);
+?>
+<h1>Customer orders</h1>
+<?php while ($order = $orders->fetch_assoc()): ?>
+  <form method="post">
+    Order #<?= (int)$order['id'] ?> —
+    User <?= (int)$order['user_id'] ?> —
+    $<?= number_format((float)$order['total'], 2) ?>
+    <select name="status">
+      <?php foreach ($statuses as $status): ?>
+        <option <?= $order['status'] === $status ? 'selected' : '' ?>>
+          <?= htmlspecialchars($status) ?>
+        </option>
+      <?php endforeach; ?>
+    </select>
+    <input type="hidden" name="order_id" value="<?= (int)$order['id'] ?>">
+    <button>Update</button>
+  </form>
+<?php endwhile; ?>
