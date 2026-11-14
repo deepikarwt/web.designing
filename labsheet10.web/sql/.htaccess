@@ -1,0 +1,14 @@
+Options -Indexes
+RewriteEngine On
+
+# Force HTTPS when the local Apache SSL virtual host is configured.
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+# Send non-file and non-directory paths to the front controller.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]
+
+ErrorDocument 404 /views/404.php
+ErrorDocument 500 /views/500.php

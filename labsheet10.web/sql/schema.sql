@@ -1,0 +1,41 @@
+CREATE DATABASE IF NOT EXISTS webapp_db
+  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE USER IF NOT EXISTS 'webapp_user'@'localhost'
+  IDENTIFIED BY 'CHANGE_THIS_TO_A_LONG_RANDOM_PASSWORD';
+
+GRANT SELECT, INSERT, UPDATE, DELETE
+  ON webapp_db.*
+  TO 'webapp_user'@'localhost';
+
+USE webapp_db;
+
+CREATE TABLE users (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(120) NOT NULL,
+  email VARCHAR(190) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  failed_attempts INT NOT NULL DEFAULT 0,
+  locked_until DATETIME NULL,
+  reset_token_hash CHAR(64) NULL,
+  reset_expires DATETIME NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE products (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(160) NOT NULL,
+  description TEXT NULL,
+  price DECIMAL(10,2) NOT NULL,
+  image_path VARCHAR(255) NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CHECK (price >= 0)
+);
+
+CREATE TABLE api_tokens (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id INT UNSIGNED NOT NULL,
+  token_hash CHAR(64) NOT NULL UNIQUE,
+  expires_at DATETIME NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
